@@ -1,0 +1,205 @@
+#!/bin/sh /etc/rc.common
+# Copyright (c) 2011-2015 OpenWrt.org
+
+START=99
+STOP=15
+
+SERVICE_USE_PID=1
+
+CLASH="/etc/clash/clash"
+CLASH_CONFIG="/etc/clash"
+CRON_FILE="/etc/crontabs/root"
+
+get_dnsmasq() {
+    mkdir "/tmp/dnsmasq.d"
+	local pid=$(pidof dnsmasq)
+	[ $? -ne 0 ] && echo "/tmp/dnsmasq.d"
+	local conf_dir=$(cat /etc/dnsmasq.conf | grep conf-dir= | sed 's/.*=//')
+	local conf_tmp=$(cat /proc/$pid/cmdline | grep dnsmasq.conf)
+	local conf_dir_tmp=$(cat $conf_tmp | grep conf-dir= | sed 's/.*=//')
+	if [ -n "$conf_dir" ]; then
+		echo $conf_dir
+	elif [  -n "$conf_dir_tmp" ];then
+		echo $conf_dir_tmp
+	else
+		echo "/tmp/dnsmasq.d"
+	fi
+}
+
+
+
+add_cron()
+{
+	sed -i '/clash.log/d' $CRON_FILE
+	echo '0 1 * * 0 echo "" > /tmp/clash.log' >> $CRON_FILE
+	[ -n "$(grep -w "/usr/share/clash/clash.sh" $CRON_FILE)" ] && sed -i '/\/usr\/share\/clash\/clash.sh/d' $CRON_FILE
+	[ $(uci get clash.config.auto_update 2>/dev/null) -eq 1 ] && echo "0 $(uci get clash.config.update_time 2>/dev/null) * * * /usr/share/clash/clash.sh" >> $CRON_FILE
+	#[ -z "$(grep -w "/usr/share/clash/update.sh" $CRON_FILE)" ] && echo "0 5 * * 0 /usr/share/clash/update.sh" >> $CRON_FILE
+	crontab $CRON_FILE
+}
+
+del_cron()
+{
+	sed -i '/clash/d' $CRON_FILE
+	sed -i '/clash.log/d' $CRON_FILE
+	/etc/init.d/cron restart
+}
+
+start_pdnsd() {
+pdnsd_port=$(uci get clash.config.pdnsd 2>/dev/null)
+	local usr_dns="$1"
+    local usr_port="$2"
+  
+	local tcp_dns_list="208.67.222.222, 208.67.220.220, 8.8.8.8, 8.8.4.4, 1.1.1.1, 114.114.114.114, 114.114.115.115"
+	[ -z "$usr_dns" ] && usr_dns="8.8.8.8"
+	[ -z "$usr_port" ] && usr_port="53"
+
+  [ -d /var/etc ] || mkdir -p /var/etc
+
+   if [ ! -d /var/pdnsd ];then
+       mkdir -p /var/pdnsd
+       echo -ne "pd13\000\000\000\000" >/var/pdnsd/pdnsd.cache
+       chown -R nobody:nogroup /var/pdnsd
+   fi
+	
+	cat > /var/etc/pdnsd.conf <<EOF
+global {
+	perm_cache=1024;
+	cache_dir="/var/pdnsd";
+	pid_file = /var/run/pdnsd.pid;
+	run_as="nobody";
+	server_ip = 0.0.0.0;
+	server_port = $pdnsd_port;
+	status_ctl = on;
+	query_method = tcp_only;
+	min_ttl=1h;
+	max_ttl=1w;
+	timeout=10;
+	neg_domain_pol=on;
+	proc_limit=2;
+	procq_limit=8;
+}
+
+
+server {
+	label= "v2-usrdns";
+	ip = $usr_dns;
+	port = $usr_port;
+	timeout=6;
+	uptest=none;
+	interval=10m;
+	purge_cache=off;
+}
+server {
+	label= "v2-pdnsd";
+	ip = $tcp_dns_list;
+	port = $pdnsd_port;
+	timeout=6;
+	uptest=none;
+	interval=10m;
+	purge_cache=off;
+}
+EOF
+
+	/usr/sbin/pdnsd -c /var/etc/pdnsd.conf -d
+	
+}
+
+
+dns_poisoning() {
+	local gfw_list=/etc/clash/dnsmasq_gfwlist.conf
+	local gfw_list_tmp=$dnsmasq_confdir/dnsmasq_gfwlist.conf
+	start_pdnsd
+			
+	[ ! -f $gfw_list_tmp ] && {
+		ln -s $gfw_list $gfw_list_tmp
+	}	
+}
+
+
+
+
+start() {
+proxy_port=$(uci get clash.config.proxy_port 2>/dev/null)
+dns_server=$(uci get clash.config.dns_server 2>/dev/null)
+dns_serve1=$(uci get dhcp.@dnsmasq[0].server 2>/dev/null)
+if pidof clash >/dev/null; then
+    kill $(pidof clash) >/dev/null 2>&1 || kill -9 $(ps | grep clash | grep -v grep | awk '{print $1}') >/dev/null 2>&1
+    sleep 2
+fi
+enable=$(uci get clash.config.enable 2>/dev/null)
+
+if [ $enable -eq 1 ]; then
+
+	dnsmasq_confdir=$(get_dnsmasq)
+	dns_poisoning
+   
+    iptables -t nat -N clash
+                
+    iptables -t nat -A clash -d 0.0.0.0/8 -j RETURN
+    iptables -t nat -A clash -d 10.0.0.0/8 -j RETURN
+    iptables -t nat -A clash -d 127.0.0.0/8 -j RETURN
+    iptables -t nat -A clash -d 169.254.0.0/16 -j RETURN
+    iptables -t nat -A clash -d 172.16.0.0/12 -j RETURN
+    iptables -t nat -A clash -d 192.168.0.0/16 -j RETURN
+    iptables -t nat -A clash -d 224.0.0.0/4 -j RETURN
+    iptables -t nat -A clash -d 240.0.0.0/4 -j RETURN
+        
+  
+    iptables -t nat -A clash -p tcp -j REDIRECT --to-ports $proxy_port
+        
+    iptables -t nat -A PREROUTING -p tcp -j clash
+
+      
+	nohup $CLASH -d "$CLASH_CONFIG" > /tmp/clash.log 2>&1 &
+
+	ln -s /usr/share/clash/web /www/clash
+
+	if [ $dns_serve1 ]; then
+		uci delete dhcp.@dnsmasq[0].server
+	fi
+	uci add_list dhcp.@dnsmasq[0].server=$dns_server
+	uci delete dhcp.@dnsmasq[0].resolvfile
+	uci set dhcp.@dnsmasq[0].noresolv=1
+	uci commit dhcp
+	/etc/init.d/dnsmasq restart >/dev/null 2>&1
+
+
+	if pidof clash >/dev/null; then
+		add_cron
+	else
+		echo "CANNOT START"
+	fi
+
+fi
+}
+
+
+
+stop() {
+    iptables -t nat -D PREROUTING -p tcp -j clash
+    iptables -t nat -F clash
+    iptables -t nat -X clash
+        
+       
+	uci delete dhcp.@dnsmasq[0].server
+	uci set dhcp.@dnsmasq[0].resolvfile="/tmp/resolv.conf.auto"
+    uci set dhcp.@dnsmasq[0].noresolv=0
+    uci commit dhcp
+		        
+    kill -9 $(ps | grep pdnsd | grep -v grep | awk '{print $1}') >/dev/null 2>&1 
+	rm -rf /var/pdnsd
+	rm -f /var/etc/pdnsd.conf
+
+	kill -9 `pidof clash|sed "s/$//g"` 2>/dev/null
+	/etc/init.d/dnsmasq restart > /dev/null 2>&1 &
+    rm -rf /www/clash 2> /dev/null
+	del_cron    
+}
+
+restart(){
+	stop
+	start
+	/etc/init.d/dnsmasq restart > /dev/null 2>&1 &
+}
+

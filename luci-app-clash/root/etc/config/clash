@@ -1,0 +1,5 @@
+config clash 'config'
+	option proxy_port '8236'
+	option pdnsd '5353'
+	option dns_server '127.0.0.1#5353'
+	option enable '0'	
