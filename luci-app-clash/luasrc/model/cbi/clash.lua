@@ -34,6 +34,22 @@ o.rmempty = false
 o.description = translate("After clash start running, wait a moment for servers to resolve,enjoy")
 
 
+bbr = s:taboption("basic", Flag, "bbr", translate("Enable BBR"))
+bbr.default = 1
+bbr.rmempty = false
+bbr.description = translate("Bottleneck Bandwidth and Round-trip propagation time (BBR)")
+
+dns = s:taboption("basic", Flag, "dns", translate("DNS Acceleration"))
+dns.default = 1
+dns.rmempty = false
+dns.description = translate("Enable DNS Cache Acceleration and anti ISP DNS pollution")
+
+o = s:taboption("basic", Value, "dnsserver", translate("Upsteam DNS Server"))
+o.default = "114.114.114.114,114.114.115.115,8.8.8.8,8.8.4.4"
+o.description = translate("Muitiple DNS server can saperate with ','")
+o:depends("dns", 1)
+
+
 o = s:taboption("basic", Value, "proxy_port")
 o.title = translate("* Clash Redir Port")
 o.default = 8236
