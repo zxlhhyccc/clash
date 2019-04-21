@@ -1,0 +1,75 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "clash"
+msgstr "clash"
+
+msgid "<b><font size=\"2\" color=\"green\">CLASH IS RUNNING</font></b>"
+msgstr "<b><font color=\"green\">CLASH 运行</font></b>"
+
+msgid "<b><font color=\"red\">CLASH NOT RUNNING</font></b>"
+msgstr "<b><font color=\"red\">CLASH 未运行</font></b>"
+
+msgid "General Settings"
+msgstr "基本设置"
+
+msgid "Server Configuration"
+msgstr "配置文件"
+
+msgid "Server logs"
+msgstr "服务器日志"
+
+msgid "Enable"
+msgstr "启用"
+
+msgid "* Clash Redir Port"
+msgstr "* 转发端口"
+
+msgid "*Dns Resolver Port"
+msgstr "* 代理dns端口"
+
+msgid "* Local Dns Fowarder"
+msgstr "* 代理dns服务器"
+
+msgid "Auto Update"
+msgstr "自动更新"
+
+msgid "Auto Update"
+msgstr "更新时间 (每天)"
+
+msgid "Subcription Url"
+msgstr "订阅URL"
+
+msgid "Stop Clash"
+msgstr "停止clash"
+
+msgid "Start Clash"
+msgstr "启动clash"
+
+msgid "Update Subcription"
+msgstr "更新"
+
+
+msgid "After clash start running, wait a moment for servers to resolve,enjoy"
+msgstr "运行后，等待服务器传播，享受"
+
+msgid "Port must be the same as in your clash config file , redir-port: 8236"
+msgstr "端口必须与冲突配置文件中的端口相同，Redir端口：8236"
+
+msgid "Make sure port 5353 is free or pdnsd resolver cannot start"
+msgstr "确保端口5353可用或PDNSD解析器无法启动"
+
+msgid "DNS Server port must be the same as pdnsd port 5353, clash nameserver: - 127.0.0.1:5353"
+msgstr "DNS服务器端口必须与PDNSD端口5353相同，clash名称服务器：-127.0.0.1:5353"
+
+msgid "Auto Update Server subscription"
+msgstr "自动更新服务器订阅"
+
+msgid "Daily Server subscription update time"
+msgstr "每日服务器订阅更新时间"
+
+msgid "You can manually place config file in /etc/clash/config.yml"
+msgstr "您可以手动将配置文件放入/etc/clash/config.yml"
+
+msgid "Changes to config file must be made from source"
+msgstr "必须从源文件更改配置文件"
