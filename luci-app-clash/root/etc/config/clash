@@ -1,5 +1,11 @@
+
 config clash 'config'
 	option proxy_port '8236'
 	option pdnsd '5353'
 	option dns_server '127.0.0.1#5353'
-	option enable '0'	
+	option enable '0'
+	option auto_update '0'
+	option update_time '0'
+	option bbr '1'
+	option dns '1'
+	option dnsserver '114.114.114.114,114.114.115.115,8.8.8.8,8.8.4.4'
