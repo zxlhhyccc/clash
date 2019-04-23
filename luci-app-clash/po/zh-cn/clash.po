@@ -44,7 +44,7 @@ msgid "Enable DNS Cache Acceleration and anti ISP DNS pollution"
 msgstr "启用DNS多线程查询、缓存，并防止ISP的DNS广告和域名劫持"
 
 
-msgid "Muitiple DNS server can saperate with ','"
+msgid "Multiple DNS server can saperate with ','"
 msgstr "支持多个上游DNS服务器，用','分隔（注意用英文逗号).请填写您最快的DNS服务器"
 
 msgid "* Clash Redir Port"
