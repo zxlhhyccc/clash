@@ -46,12 +46,12 @@ dns.description = translate("Enable DNS Cache Acceleration and anti ISP DNS poll
 
 o = s:taboption("basic", Value, "dnsserver", translate("Upstream DNS Server 1"))
 o.default = "114.114.114.114,114.114.115.115"
-o.description = translate("Muitiple DNS server can saperate with ','")
+o.description = translate("Multiple DNS server can saperate with ','")
 o:depends("dns", 1)
 
 o = s:taboption("basic", Value, "dnsserver_d", translate("Upstream DNS Server 2"))
 o.default = "208.67.222.222, 208.67.220.220"
-o.description = translate("Muitiple DNS server can saperate with ','")
+o.description = translate("Multiple DNS server can saperate with ','")
 o:depends("dns", 1)
 
 o = s:taboption("basic", Value, "proxy_port")
