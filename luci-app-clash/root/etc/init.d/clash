@@ -299,8 +299,6 @@ if [ $enable -eq 1 ]; then
 		sysctl -w net.ipv4.tcp_congestion_control=cubic
 	fi
 	
-	uci set firewall.@defaults[0].flow_offloading=$(uci get flowoffload.@flow[0].flow_offloading)
-    uci commit firewall
 	
 	/etc/init.d/firewall restart >/dev/null 2>&1
 	
