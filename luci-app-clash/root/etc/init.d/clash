@@ -12,8 +12,7 @@ CRON_FILE="/etc/crontabs/root"
 USE_PROCD=1
 
 PDNSD_BIN="/var/sbin/dnscache"
-DNSMASQ_RESTART=N
-DNS_SERVER="114.114.114.114,114.114.115.115,8.8.8.8,8.8.4.4"
+#DNS_SERVER="114.114.114.114,114.114.115.115"
 
 pdnsd_genconfig() {
   DNS_SERVER=$(uci get clash.config.dnsserver 2>/dev/null)
@@ -137,14 +136,13 @@ EOF
   
   [ -d /var/sbin ] || mkdir -p /var/sbin
   [ -f /var/sbin/dnscache ] || cp -a /usr/sbin/pdnsd /var/sbin/dnscache
-	echo "Start DNS Cache"
 }
+
 
 stop_pdnsd() {
   kill $(pidof dnscache) >/dev/null 2>&1 || kill -9 $(ps | grep dnscache | grep -v grep | awk '{print $1}') >/dev/null 2>&1
   echo "Stop DNS Cache"
 }
-
 
 start_pdnsd() {
 pdnsd_port=$(uci get clash.config.pdnsd 2>/dev/null)
@@ -207,7 +205,7 @@ EOF
 }
 
 
-change_dns() {
+change_dns(){
 dns_server=$(uci get clash.config.dns_server 2>/dev/null)
 dns_serve1=$(uci get dhcp.@dnsmasq[0].server 2>/dev/null)
 
@@ -230,25 +228,7 @@ revert_dns() {
 	uci commit dhcp
 }
 
-get_dnsmasq() {
-	local pid=$(pidof dnsmasq)
-	[ $? -ne 0 ] && echo "/tmp/dnsmasq.d"
-	local conf_dir=$(cat /etc/dnsmasq.conf | grep conf-dir= | sed 's/.*=//')
-	local conf_tmp=$(cat /proc/$pid/cmdline | grep dnsmasq.conf)
-	local conf_dir_tmp=$(cat $conf_tmp | grep conf-dir= | sed 's/.*=//')
-	if [ -n "$conf_dir" ]; then
-		echo $conf_dir
-	elif [  -n "$conf_dir_tmp" ];then
-		echo $conf_dir_tmp
-	else
-		echo "/tmp/dnsmasq.d"
-	fi
-}
-
-
-
-add_cron()
-{
+add_cron(){
 	sed -i '/clash.log/d' $CRON_FILE
 	echo '0 1 * * 0 echo "" > /tmp/clash.log' >> $CRON_FILE
 	[ -n "$(grep -w "/usr/share/clash/clash.sh" $CRON_FILE)" ] && sed -i '/\/usr\/share\/clash\/clash.sh/d' $CRON_FILE
@@ -265,6 +245,22 @@ del_cron()
 }
 
 
+get_dnsmasq() {
+	local pid=$(pidof dnsmasq)
+	[ $? -ne 0 ] && echo "/tmp/dnsmasq.d"
+	local conf_dir=$(cat /etc/dnsmasq.conf | grep conf-dir= | sed 's/.*=//')
+	local conf_tmp=$(cat /proc/$pid/cmdline | grep dnsmasq.conf)
+	local conf_dir_tmp=$(cat $conf_tmp | grep conf-dir= | sed 's/.*=//')
+	if [ -n "$conf_dir" ]; then
+		echo $conf_dir
+	elif [  -n "$conf_dir_tmp" ];then
+		echo $conf_dir_tmp
+	else
+		echo "/tmp/dnsmasq.d"
+	fi
+}
+
+
 dns_poisoning() {
 	local gfw_list=/etc/clash/dnsmasq_gfwlist.conf
 	local gfw_list_tmp=$dnsmasq_confdir/dnsmasq_gfwlist.conf
@@ -276,52 +272,43 @@ dns_poisoning() {
 }
 
 
-
-
-start_service() {
+start_service(){
 
 proxy_port=$(uci get clash.config.proxy_port 2>/dev/null)
 
-if pidof clash >/dev/null; then
-    kill $(pidof clash) >/dev/null 2>&1 || kill -9 $(ps | grep clash | grep -v grep | awk '{print $1}') >/dev/null 2>&1
-    sleep 2
-fi
-
-
-
-  
 enable=$(uci get clash.config.enable 2>/dev/null)
 
 if [ $enable -eq 1 ]; then
 
 
-	  dns=$(uci get clash.config.dns 2>/dev/null)
-	  bbr=$(uci get clash.config.bbr 2>/dev/null)
-	  if [ $dns -eq 1 ];  then
-		pdnsd_genconfig
+	dns=$(uci get clash.config.dns 2>/dev/null)
+	bbr=$(uci get clash.config.bbr 2>/dev/null)
+	  
+	if [ $dns -eq 1 ];  then
+		pdnsd_genconfig		
 		procd_open_instance
 		procd_set_param command "$PDNSD_BIN" -c /var/etc/dnscache.conf
 		procd_set_param respawn
 		procd_set_param stderr 1
 		procd_close_instance
 		change_dns
-	  fi
-	  if [ $bbr -eq 1 ];  then
+	fi
+	  
+	if [ $bbr -eq 1 ];  then
 		sysctl -w net.ipv4.tcp_congestion_control=bbr
-	  else
+	else
 		sysctl -w net.ipv4.tcp_congestion_control=cubic
-	  fi
-	  uci set firewall.@defaults[0].flow_offloading=$(uci get flowoffload.@flow[0].flow_offloading)
-	  uci set firewall.@defaults[0].flow_offloading_hw=$(uci get flowoffload.@flow[0].flow_offloading_hw)
-	  uci commit firewall
+	fi
 	
-	  /etc/init.d/firewall restart
-	 
-	 
-	 
-	dnsmasq_confdir=$(get_dnsmasq)
+	uci set firewall.@defaults[0].flow_offloading=$(uci get flowoffload.@flow[0].flow_offloading)
+    uci commit firewall
+	
+	/etc/init.d/firewall restart >/dev/null 2>&1
+	
+    dnsmasq_confdir=$(get_dnsmasq)
 	dns_poisoning
-  
+
+	
     iptables -t nat -N clash
                 
     iptables -t nat -A clash -d 0.0.0.0/8 -j RETURN
@@ -332,64 +319,64 @@ if [ $enable -eq 1 ]; then
     iptables -t nat -A clash -d 192.168.0.0/16 -j RETURN
     iptables -t nat -A clash -d 224.0.0.0/4 -j RETURN
     iptables -t nat -A clash -d 240.0.0.0/4 -j RETURN
-        
-  
+         
     iptables -t nat -A clash -p tcp -j REDIRECT --to-ports $proxy_port
         
     iptables -t nat -A PREROUTING -p tcp -j clash
+     
+    nohup $CLASH -d "$CLASH_CONFIG" > /tmp/clash.log 2>&1 &
 
-      
-	nohup $CLASH -d "$CLASH_CONFIG" > /tmp/clash.log 2>&1 &
-
-	ln -s /usr/share/clash/web /www/clash
+    ln -s /usr/share/clash/web /www/clash
 	
-	/etc/init.d/dnsmasq restart >/dev/null 2>&1
+    /etc/init.d/dnsmasq restart >/dev/null 2>&1
 	
 	
-	if pidof clash >/dev/null; then
-		add_cron
+    if pidof clash >/dev/null; then
+	add_cron
 	else
-		echo "CANNOT START"
-	fi
-
+	echo "CANNOT START"
+   fi
+	
 fi
 }
 
 
 
-stop_service() {
+stop_service(){
 
     iptables -t nat -D PREROUTING -p tcp -j clash
     iptables -t nat -F clash
     iptables -t nat -X clash
         
     revert_dns
-    uci set firewall.@defaults[0].flow_offloading=$(uci get flowoffload.@flow[0].flow_offloading)
-    uci set firewall.@defaults[0].flow_offloading_hw=$(uci get flowoffload.@flow[0].flow_offloading_hw)
-    uci commit firewall
-	
-		
+    
     kill $(pidof dnscache) >/dev/null 2>&1 || kill -9 $(ps | grep dnscache | grep -v grep | awk '{print $1}') >/dev/null 2>&1
 	
-	kill -9 $(ps | grep pdnsd | grep -v grep | awk '{print $1}') >/dev/null 2>&1 
-	rm -rf /var/pdnsd
-	rm -f /var/etc/pdnsd.conf
+    kill -9 $(ps | grep pdnsd | grep -v grep | awk '{print $1}') >/dev/null 2>&1 
+    rm -rf /var/pdnsd
+    rm -f /var/etc/pdnsd.conf
 
-	kill -9 `pidof clash|sed "s/$//g"` 2>/dev/null
+    kill -9 `pidof clash|sed "s/$//g"` 2>/dev/null
 	
-	if [ "$DNSMASQ_RESTART" = N ]; then
-      /etc/init.d/dnsmasq restart && echo "DNSMASQ revert"
-      /etc/init.d/firewall restart
-    fi
+    sysctl -w net.ipv4.tcp_congestion_control=cubic
 	
+    uci set firewall.@defaults[0].flow_offloading=$(uci get flowoffload.@flow[0].flow_offloading)
+    uci commit firewall
+	
+    /etc/init.d/firewall restart >/dev/null 2>&1
+	
+    /etc/init.d/dnsmasq restart >/dev/null 2>&1
+     
     rm -rf /www/clash 2> /dev/null
-	del_cron    
+   del_cron  
+	
 }
 
 restart(){
-    DNSMASQ_RESTART=Y
     stop
     start
-	  /etc/init.d/dnsmasq restart && echo "DNSMASQ restart"
-    /etc/init.d/firewall restart
+    /etc/init.d/firewall restart >/dev/null 2>&1
+    /etc/init.d/dnsmasq restart >/dev/null 2>&1
 }
+
+
