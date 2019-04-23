@@ -12,7 +12,6 @@ CRON_FILE="/etc/crontabs/root"
 USE_PROCD=1
 
 PDNSD_BIN="/var/sbin/dnscache"
-#DNS_SERVER="114.114.114.114,114.114.115.115"
 
 pdnsd_genconfig() {
   DNS_SERVER=$(uci get clash.config.dnsserver 2>/dev/null)
