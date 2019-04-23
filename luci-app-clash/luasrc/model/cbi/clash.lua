@@ -46,7 +46,7 @@ dns.description = translate("Enable DNS Cache Acceleration and anti ISP DNS poll
 
 o = s:taboption("basic", Value, "dnsserver", translate("Upstream DNS Server"))
 o.default = "114.114.114.114,114.114.115.115,8.8.8.8,8.8.4.4"
-o.description = translate("Muitiple DNS server can saperate with ','")
+o.description = translate("Multiple DNS server can saperate with ','")
 o:depends("dns", 1)
 
 
