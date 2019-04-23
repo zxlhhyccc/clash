@@ -356,10 +356,7 @@ stop_service(){
     kill -9 `pidof clash|sed "s/$//g"` 2>/dev/null
 	
     sysctl -w net.ipv4.tcp_congestion_control=cubic
-	
-    uci set firewall.@defaults[0].flow_offloading=$(uci get flowoffload.@flow[0].flow_offloading)
-    uci commit firewall
-	
+
     /etc/init.d/firewall restart >/dev/null 2>&1
 	
     /etc/init.d/dnsmasq restart >/dev/null 2>&1
