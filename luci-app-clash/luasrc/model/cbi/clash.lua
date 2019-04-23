@@ -9,7 +9,7 @@ local UTIL = require "luci.util"
 local button = ""
 
 if luci.sys.call("pidof clash >/dev/null") == 0 then
-button = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type=\"button\" class=\"btn \" style=\"background-color:black;color:white\" value=\" " .. translate(" OPEN WEB INTERFACE ") .. " \" onclick=\"window.open('http://'+window.location.hostname+'/clash')\"/>"
+button = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type=\"button\" class=\"btn \" style=\"background-color:black;color:white\" value=\" " .. translate(" OPEN CONTROL INTERFACE ") .. " \" onclick=\"window.open('http://'+window.location.hostname+'/clash')\"/>"
 m = Map("clash", translate("Clash"),"%s  %s" %{translate(""), translate("<b><font size=\"2\" color=\"green\">CLASH IS RUNNING</font></b>")} .. button)
 
 else
@@ -44,11 +44,15 @@ dns.default = 1
 dns.rmempty = false
 dns.description = translate("Enable DNS Cache Acceleration and anti ISP DNS pollution")
 
-o = s:taboption("basic", Value, "dnsserver", translate("Upstream DNS Server"))
-o.default = "114.114.114.114,114.114.115.115,8.8.8.8,8.8.4.4"
-o.description = translate("Multiple DNS server can saperate with ','")
+o = s:taboption("basic", Value, "dnsserver", translate("Upstream DNS Server 1"))
+o.default = "114.114.114.114,114.114.115.115"
+o.description = translate("Muitiple DNS server can saperate with ','")
 o:depends("dns", 1)
 
+o = s:taboption("basic", Value, "dnsserver_d", translate("Upstream DNS Server 2"))
+o.default = "208.67.222.222, 208.67.220.220"
+o.description = translate("Muitiple DNS server can saperate with ','")
+o:depends("dns", 1)
 
 o = s:taboption("basic", Value, "proxy_port")
 o.title = translate("* Clash Redir Port")
@@ -58,30 +62,32 @@ o.rmempty = false
 o.description = translate("Port must be the same as in your clash config file , redir-port: 8236")
 
 o = s:taboption("basic", Value, "pdnsd")
-o.title = translate("*Dns Resolver Port")
+o.title = translate("*Dns Resolver Port 1")
 o.default = 5353
 o.datatype = "port"
 o.rmempty = false
-o.description = translate("Make sure port 5353 is free or pdnsd resolver cannot start")
+o.description = translate("Make sure port 5353 is free or resolver cannot start")
+
+o = s:taboption("basic", Value, "dnscache")
+o.title = translate("*Dns Resolver Port 2")
+o.default = 5333
+o.datatype = "port"
+o.rmempty = false
+o.description = translate("Make sure port 5333 is free or resolver cannot start")
+
 
 o = s:taboption("basic", Value, "dns_server")
-o.title = translate("* Local Dns Fowarder")
+o.title = translate("* Local Dns Fowarder 1")
 o.default = "127.0.0.1#5353"
 o.rmempty = false
-o.description = translate("DNS Server port must be the same as  pdnsd port 5353, clash nameserver: - 127.0.0.1:5353")
+o.description = translate("DNS Server port must be the same as Dns Resolver Port 1 clash nameserver: - 127.0.0.1:5353")
 
-o = s:taboption("basic", Flag, "auto_update", translate("Auto Update"))
+o = s:taboption("basic", Value, "dns_server_d")
+o.title = translate("* Local Dns Fowarder 2")
+o.default = "127.0.0.1#5353"
 o.rmempty = false
-o.description = translate("Auto Update Server subscription")
+o.description = translate("DNS Server port must be the same as Dns Resolver Port 2 clash nameserver: - 127.0.0.1:5353")
 
-
-o = s:taboption("basic", ListValue, "update_time", translate("Update time (every day)"))
-for t = 0,23 do
-o:value(t, t..":00")
-end
-o.default=0
-o.rmempty = false
-o.description = translate("Daily Server subscription update time")
 
 o = s:taboption("basic", Value, "subscribe_url")
 o.title = translate("Subcription Url")
@@ -90,7 +96,7 @@ o.rmempty = true
 
 o = s:taboption("basic", Button,"update")
 o.title = translate("Update Subcription")
-o.inputtitle = translate("Update Config")
+o.inputtitle = translate("Update Configuration")
 o.inputstyle = "reload"
 o.write = function()
   os.execute("mv /etc/clash/config.yml /etc/clash/config.bak")
@@ -98,24 +104,6 @@ o.write = function()
   HTTP.redirect(DISP.build_url("admin", "services", "clash"))
 end
 
-o = s:taboption("basic", Button,"start")
-o.title = translate("Start Clash")
-o.inputtitle = translate("Start Clash")
-o.inputstyle = "reload"
-o.write = function()
-  os.execute("chmod +x /etc/init.d/clash")
-  SYS.call("/etc/init.d/clash start >/dev/null 2>&1")
-  HTTP.redirect(DISP.build_url("admin", "services", "clash"))
-end
-
-o = s:taboption("basic", Button,"stop")
-o.title = translate("Stop Clash")
-o.inputtitle = translate("Stop Clash")
-o.inputstyle = "reload"
-o.write = function()
-  SYS.call("/etc/init.d/clash stop >/dev/null 2>&1")
-  HTTP.redirect(DISP.build_url("admin", "services", "clash"))
-end
 
 s:tab("address",  translate("Server Configuration"))
 local conf = "/etc/clash/config.yml"
@@ -145,9 +133,12 @@ end
 o.write = function(self, section, value)
 	NXFS.writefile(clog, value:gsub("\r\n", "\n"))
 end
-
 local apply = luci.http.formvalue("cbi.apply")
 if apply then
-	os.execute("chmod +x /etc/init.d/clash")
+	os.execute("chmod +x /etc/init.d/clash >/dev/null 2>&1 &")
+       os.execute("/etc/init.d/clash restart >/dev/null 2>&1 &")
 end
+
+
 return m
+

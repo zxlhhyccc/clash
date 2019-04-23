@@ -10,7 +10,7 @@ msgstr "<b><font color=\"green\">CLASH 运行</font></b>"
 msgid "<b><font color=\"red\">CLASH NOT RUNNING</font></b>"
 msgstr "<b><font color=\"red\">CLASH 未运行</font></b>"
 
-msgid " OPEN WEB INTERFACE "
+msgid " OPEN CONTROL INTERFACE "
 msgstr " 打开Web界面 "
 
 msgid "General Settings"
@@ -25,8 +25,11 @@ msgstr "服务器日志"
 msgid "Enable"
 msgstr "启用"
 
-msgid "Upstream DNS Server"
-msgstr "上游 DNS 服务器"
+msgid "Upstream DNS Server 1"
+msgstr "上游 DNS 服务器(国内)"
+
+msgid "Upstream DNS Server 2"
+msgstr "上游 DNS 服务器(国际)"
 
 msgid "Enable BBR"
 msgstr "启用 BBR"
@@ -40,53 +43,51 @@ msgstr "DNS 加速"
 msgid "Enable DNS Cache Acceleration and anti ISP DNS pollution"
 msgstr "启用DNS多线程查询、缓存，并防止ISP的DNS广告和域名劫持"
 
-msgid "Upsteam DNS Server"
-msgstr "上游 DNS 服务器(国内)"
 
-msgid "Multiple DNS server can saperate with ','"
+msgid "Muitiple DNS server can saperate with ','"
 msgstr "支持多个上游DNS服务器，用','分隔（注意用英文逗号).请填写您最快的DNS服务器"
 
 msgid "* Clash Redir Port"
 msgstr "* 转发端口"
 
-msgid "*Dns Resolver Port"
-msgstr "* 代理dns端口"
+msgid "*Dns Resolver Port 1"
+msgstr "* 代理dns端口 1"
 
-msgid "* Local Dns Fowarder"
-msgstr "* 代理dns服务器"
+msgid "*Dns Resolver Port 2"
+msgstr "* 代理dns端口 2"
 
-msgid "Auto Update"
-msgstr "自动更新"
+msgid "* Local Dns Fowarder 1"
+msgstr "* 代理dns服务器 1"
 
-msgid "Auto Update"
-msgstr "更新时间 (每天)"
+msgid "* Local Dns Fowarder 2"
+msgstr "* 代理dns服务器 2"
 
 msgid "Subcription Url"
 msgstr "订阅URL"
 
-msgid "Stop Clash"
-msgstr "停止clash"
-
-msgid "Start Clash"
-msgstr "启动clash"
-
 msgid "Update Subcription"
 msgstr "更新"
 
-msgid "Update Config"
-msgstr "更新"
+msgid "Update Configuration"
+msgstr "更新配置文件"
 
 msgid "After clash start running, wait a moment for servers to resolve,enjoy"
-msgstr "运行后，等待服务器传播，享受"
+msgstr "运行后，等待服务器传播"
 
 msgid "Port must be the same as in your clash config file , redir-port: 8236"
 msgstr "端口必须与冲突配置文件中的端口相同，Redir端口：8236"
 
-msgid "Make sure port 5353 is free or pdnsd resolver cannot start"
+msgid "Make sure port 5353 is free or resolver cannot start"
 msgstr "确保端口5353可用或PDNSD解析器无法启动"
 
-msgid "DNS Server port must be the same as pdnsd port 5353, clash nameserver: - 127.0.0.1:5353"
-msgstr "DNS服务器端口必须与PDNSD端口5353相同，clash名称服务器：-127.0.0.1:5353"
+msgid "Make sure port 5333 is free or resolver cannot start"
+msgstr "确保端口5333可用或PDNSD解析器无法启动"
+
+msgid "DNS Server port must be the same as Dns Resolver Port 1 clash nameserver: - 127.0.0.1:5353"
+msgstr "DNS服务器端口必须与代理dns端口 1 5353相同，clash名称服务器：-127.0.0.1:5353"
+
+msgid "DNS Server port must be the same as Dns Resolver Port 2 clash nameserver: - 127.0.0.1:5353"
+msgstr "DNS服务器端口必须与代理dns端口 2 5333相同，clash名称服务器：-127.0.0.1:5333"
 
 msgid "Auto Update Server subscription"
 msgstr "自动更新服务器订阅"
