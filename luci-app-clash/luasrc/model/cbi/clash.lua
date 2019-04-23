@@ -9,9 +9,9 @@ local UTIL = require "luci.util"
 local button = ""
 
 if luci.sys.call("pidof clash >/dev/null") == 0 then
-button = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type=\"button\" class=\"btn \" style=\"background-color:black;color:white\" value=\" " .. translate(" OPEN WEB INTERFACE ") .. " \" onclick=\"window.open('http://'+window.location.hostname+'/clash')\"/><br><b><font size=\"2\" color=\"green\">CLASH IS RUNNING</font></b>"
-m = Map("clash", translate("Clash") .. button)
-pdnsd=1
+button = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type=\"button\" class=\"btn \" style=\"background-color:black;color:white\" value=\" " .. translate(" OPEN WEB INTERFACE ") .. " \" onclick=\"window.open('http://'+window.location.hostname+'/clash')\"/>"
+m = Map("clash", translate("Clash"),"%s  %s" %{translate(""), translate("<b><font size=\"2\" color=\"green\">CLASH IS RUNNING</font></b>")} .. button)
+
 else
 m = Map("clash", translate("Clash"), "%s  %s" %{translate(""), translate("<b><font color=\"red\">CLASH NOT RUNNING</font></b>")})
 
@@ -23,7 +23,7 @@ s = m:section(TypedSection, "clash")
 s.anonymous = true
 
 
-s:tab("basic",  translate("General Setting"))
+s:tab("basic",  translate("General Settings"))
 
 
 
@@ -44,7 +44,7 @@ dns.default = 1
 dns.rmempty = false
 dns.description = translate("Enable DNS Cache Acceleration and anti ISP DNS pollution")
 
-o = s:taboption("basic", Value, "dnsserver", translate("Upsteam DNS Server"))
+o = s:taboption("basic", Value, "dnsserver", translate("Upstream DNS Server"))
 o.default = "114.114.114.114,114.114.115.115,8.8.8.8,8.8.4.4"
 o.description = translate("Muitiple DNS server can saperate with ','")
 o:depends("dns", 1)
@@ -88,7 +88,6 @@ o.title = translate("Subcription Url")
 o.description = translate("You can manually place config file in  /etc/clash/config.yml")
 o.rmempty = true
 
-
 o = s:taboption("basic", Button,"update")
 o.title = translate("Update Subcription")
 o.inputtitle = translate("Update Config")
@@ -105,20 +104,18 @@ o.inputtitle = translate("Start Clash")
 o.inputstyle = "reload"
 o.write = function()
   os.execute("chmod +x /etc/init.d/clash")
-  SYS.call("/etc/init.d/clash start")
+  SYS.call("/etc/init.d/clash start >/dev/null 2>&1")
   HTTP.redirect(DISP.build_url("admin", "services", "clash"))
 end
-
 
 o = s:taboption("basic", Button,"stop")
 o.title = translate("Stop Clash")
 o.inputtitle = translate("Stop Clash")
 o.inputstyle = "reload"
 o.write = function()
-  SYS.call("/etc/init.d/clash stop")
+  SYS.call("/etc/init.d/clash stop >/dev/null 2>&1")
   HTTP.redirect(DISP.build_url("admin", "services", "clash"))
 end
-
 
 s:tab("address",  translate("Server Configuration"))
 local conf = "/etc/clash/config.yml"
@@ -132,9 +129,6 @@ o.cfgvalue = function(self, section)
 end
 o.write = function(self, section, value)
 end
-
-
-
 
 
 s:tab("log",  translate("Server logs"))
