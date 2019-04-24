@@ -6,26 +6,13 @@ local DISP = require "luci.dispatcher"
 local UTIL = require "luci.util"
 
 
-local button = ""
-
-if luci.sys.call("pidof clash >/dev/null") == 0 then
-button = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type=\"button\" class=\"btn \" style=\"background-color:black;color:white\" value=\" " .. translate(" OPEN CONTROL INTERFACE ") .. " \" onclick=\"window.open('http://'+window.location.hostname+'/clash')\"/>"
-m = Map("clash", translate("Clash"),"%s  %s" %{translate(""), translate("<b><font size=\"2\" color=\"green\">CLASH IS RUNNING</font></b>")} .. button)
-
-else
-m = Map("clash", translate("Clash"), "%s  %s" %{translate(""), translate("<b><font color=\"red\">CLASH NOT RUNNING</font></b>")})
-
-
-end
-
+m = Map("clash", translate("Clash"))
+m:section(SimpleSection).template  = "clash/status"
 
 s = m:section(TypedSection, "clash")
 s.anonymous = true
 
-
 s:tab("basic",  translate("General Settings"))
-
-
 
 o = s:taboption("basic", Flag, "enable")
 o.title = translate("Enable")
@@ -141,4 +128,5 @@ end
 
 
 return m
+
 

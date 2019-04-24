@@ -4,14 +4,7 @@ msgstr "Content-Type: text/plain; charset=UTF-8\n"
 msgid "clash"
 msgstr "clash"
 
-msgid "<b><font size=\"2\" color=\"green\">CLASH IS RUNNING</font></b>"
-msgstr "<b><font color=\"green\">CLASH 运行</font></b>"
 
-msgid "<b><font color=\"red\">CLASH NOT RUNNING</font></b>"
-msgstr "<b><font color=\"red\">CLASH 未运行</font></b>"
-
-msgid " OPEN CONTROL INTERFACE "
-msgstr " 打开Web界面 "
 
 msgid "General Settings"
 msgstr "基本设置"
