@@ -4,9 +4,7 @@ msgstr "Content-Type: text/plain; charset=UTF-8\n"
 msgid "clash"
 msgstr "clash"
 
-
-
-msgid "General Settings"
+msgid "Clash Client"
 msgstr "基本设置"
 
 msgid "Server Configuration"
@@ -15,13 +13,19 @@ msgstr "配置文件"
 msgid "Server logs"
 msgstr "服务器日志"
 
+msgid "Logs"
+msgstr "服务器日志"
+
 msgid "Enable"
 msgstr "启用"
 
-msgid "Upstream DNS Server 1"
+msgid "Enable Clash"
+msgstr "启用 Clash"
+
+msgid "DNS Server 1"
 msgstr "上游 DNS 服务器(国内)"
 
-msgid "Upstream DNS Server 2"
+msgid "DNS Server 2"
 msgstr "上游 DNS 服务器(国际)"
 
 msgid "Enable BBR"
@@ -30,8 +34,20 @@ msgstr "启用 BBR"
 msgid "Bottleneck Bandwidth and Round-trip propagation time (BBR)"
 msgstr "BBR拥塞控制算法可以加强TCP应用表现，但会降低路由器本机上的WIFI吞吐性能"
 
+msgid "Enable DNS"
+msgstr "启用 DNS 加速"
+
 msgid "DNS Acceleration"
 msgstr "DNS 加速"
+
+msgid "Clash Client"
+msgstr "Clash 客户端"
+
+msgid "DNS Settings"
+msgstr "DNS 设置"
+
+msgid "Server Config"
+msgstr "服务器配置"
 
 msgid "Enable DNS Cache Acceleration and anti ISP DNS pollution"
 msgstr "启用DNS多线程查询、缓存，并防止ISP的DNS广告和域名劫持"
@@ -43,16 +59,16 @@ msgstr "支持多个上游DNS服务器，用','分隔（注意用英文逗号).�
 msgid "* Clash Redir Port"
 msgstr "* 转发端口"
 
-msgid "*Dns Resolver Port 1"
+msgid "* Dns Resolver Port 1"
 msgstr "* 代理dns端口 1"
 
-msgid "*Dns Resolver Port 2"
+msgid "* Dns Resolver Port 2"
 msgstr "* 代理dns端口 2"
 
-msgid "* Local Dns Fowarder 1"
+msgid "* Dns Fowarder 1"
 msgstr "* 代理dns服务器 1"
 
-msgid "* Local Dns Fowarder 2"
+msgid "* Dns Fowarder 2"
 msgstr "* 代理dns服务器 2"
 
 msgid "Subcription Url"

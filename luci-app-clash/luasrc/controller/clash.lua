@@ -5,11 +5,13 @@ function index()
 		return
 	end
 
-	local page
 
-	page = entry({"admin", "services", "clash"}, cbi("clash"), _("Clash"), 60)
-	page.dependent = true
+	entry({"admin", "services", "clash"},alias("admin", "services", "clash", "client"), _("Clash"), 60).dependent = true
+	entry({"admin", "services", "clash", "client"},cbi("clash/client"),_("Clash Client"), 10).leaf = true
+	entry({"admin", "services", "clash", "dns"},cbi("clash/dns"),_("DNS Settings"), 20).leaf = true
+	entry({"admin", "services", "clash", "config"},cbi("clash/config"),_("Server Config"), 30).leaf = true
 	entry({"admin","services","clash","status"},call("action_status")).leaf=true
+	entry({"admin", "services", "clash", "log"},cbi("clash/log"),_("Logs"), 40).leaf = true
 
 	
 end
@@ -31,9 +33,6 @@ local function is_pdn()
 	return luci.sys.call("pgrep pdnsd >/dev/null") == 0
 end
 
-local function is_dns()
-	return luci.sys.call("pgrep dnscache >/dev/null") == 0
-end
 
 function action_status()
 	luci.http.prepare_content("application/json")
@@ -41,7 +40,6 @@ function action_status()
 		web = is_web(),
 		clash = is_running(),
 		bbr = is_bbr(),
-		dnscache = is_dns(),
 		pdnsd = is_pdn()
 	})
 end

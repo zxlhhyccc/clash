@@ -141,10 +141,6 @@ EOF
 }
 
 
-stop_pdnsd() {
-  kill $(pidof dnscache) >/dev/null 2>&1 || kill -9 $(ps | grep dnscache | grep -v grep | awk '{print $1}') >/dev/null 2>&1
-  echo "Stop DNS Cache"
-}
 
 start_pdnsd() {
 pdnsd_port=$(uci get clash.config.pdnsd 2>/dev/null)
@@ -235,8 +231,6 @@ revert_dns() {
 add_cron(){
 	sed -i '/clash.log/d' $CRON_FILE
 	echo '0 1 * * 0 echo "" > /tmp/clash.log' >> $CRON_FILE
-	[ -n "$(grep -w "/usr/share/clash/clash.sh" $CRON_FILE)" ] && sed -i '/\/usr\/share\/clash\/clash.sh/d' $CRON_FILE
-	[ $(uci get clash.config.auto_update 2>/dev/null) -eq 1 ] && echo "0 $(uci get clash.config.update_time 2>/dev/null) * * * /usr/share/clash/clash.sh" >> $CRON_FILE
 	crontab $CRON_FILE
 }
 
@@ -349,37 +343,29 @@ fi
 
 
 stop_service(){
-    
-    iptables -t nat -D PREROUTING -p tcp -j clash
-    iptables -t nat -F clash
-    iptables -t nat -X clash
-        
-    revert_dns
-	
-    
-    kill $(pidof dnscache) >/dev/null 2>&1 || kill -9 $(ps | grep dnscache | grep -v grep | awk '{print $1}') >/dev/null 2>&1
-	
+
+
 	kill -9 $(ps | grep pdnsd | grep -v grep | awk '{print $1}') >/dev/null 2>&1 
-	rm -rf /var/pdnsd
-	rm -f /var/etc/pdnsd.conf
 
 	kill -9 `pidof clash|sed "s/$//g"` 2>/dev/null
 	
 	sysctl -w net.ipv4.tcp_congestion_control=cubic
+        kill $(pidof dnscache) >/dev/null 2>&1 || kill -9 $(ps | grep dnscache | grep -v grep | awk '{print $1}') >/dev/null 2>&1
 	
-	uci set firewall.@defaults[0].flow_offloading=1
-    uci commit firewall
-	
+	revert_dns
+
 	/etc/init.d/firewall restart >/dev/null 2>&1
 	
-    /etc/init.d/dnsmasq restart >/dev/null 2>&1
+       /etc/init.d/dnsmasq restart >/dev/null 2>&1
      
-    rm -rf /www/clash 2> /dev/null
-	del_cron  
+       rm -rf /www/clash 2> /dev/null
+      del_cron  
+	watchdog_service
+  
 	
 }
-
 restart(){
     stop
     start
 }
+
