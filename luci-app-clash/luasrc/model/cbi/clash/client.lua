@@ -28,33 +28,6 @@ o.datatype = "port"
 o.rmempty = false
 o.description = translate("Port must be the same as in your clash config file , redir-port: 8236")
 
-o = s:option(Value, "pdnsd")
-o.title = translate("* Dns Resolver Port 1")
-o.default = 5353
-o.datatype = "port"
-o.rmempty = false
-o.description = translate("Make sure port 5353 is free or resolver cannot start")
-
-o = s:option(Value, "dnscache")
-o.title = translate("* Dns Resolver Port 2")
-o.default = 5333
-o.datatype = "port"
-o.rmempty = false
-o.description = translate("Make sure port 5333 is free or resolver cannot start")
-
-
-o = s:option(Value, "dns_server")
-o.title = translate("* Dns Fowarder 1")
-o.default = "127.0.0.1#5353"
-o.rmempty = false
-o.description = translate("DNS Server port must be the same as Dns Resolver Port 1 clash nameserver: - 127.0.0.1:5353")
-
-o = s:option(Value, "dns_server_d")
-o.title = translate("* Dns Fowarder 2")
-o.default = "127.0.0.1#5353"
-o.rmempty = false
-o.description = translate("DNS Server port must be the same as Dns Resolver Port 2 clash nameserver: - 127.0.0.1:5353")
-
 
 o = s:option(Value, "subscribe_url")
 o.title = translate("Subcription Url")
@@ -72,11 +45,24 @@ o.write = function()
 end
 
 
-
-local apply = luci.http.formvalue("cbi.apply")
-if apply then
-       os.execute("bash /usr/share/clash/watchdog.sh")
+o = s:option(Button,"start")
+o.title = translate("Start Client")
+o.inputtitle = translate("Start Client")
+o.inputstyle = "reload"
+o.write = function()
+  os.execute("/etc/init.d/clash start >/dev/null 2>&1")
+  HTTP.redirect(DISP.build_url("admin", "services", "clash"))
 end
+
+o = s:option(Button,"stop")
+o.title = translate("Stop Client")
+o.inputtitle = translate("Stop Client")
+o.inputstyle = "reload"
+o.write = function()
+  os.execute("/etc/init.d/clash stop >/dev/null 2>&1")
+  HTTP.redirect(DISP.build_url("admin", "services", "clash"))
+end
+
 
 
 return m

@@ -6,7 +6,7 @@ local DISP = require "luci.dispatcher"
 local UTIL = require "luci.util"
 
 
-m = Map("clash", translate("DNS Acceleration"))
+m = Map("clash", translate("DNS Acceleration & Forwarder"))
 s = m:section(TypedSection, "clash")
 s.anonymous = true
 
@@ -31,5 +31,31 @@ o.default = "208.67.222.222,208.67.220.220"
 o.description = translate("Multiple DNS server can saperate with ','")
 o:depends("dns", 1)
 
+o = s:option(Value, "pdnsd")
+o.title = translate("* Dns Resolver Port 1")
+o.default = 5353
+o.datatype = "port"
+o.rmempty = false
+o.description = translate("Make sure port 5353 is free or resolver cannot start")
+
+o = s:option(Value, "dnscache")
+o.title = translate("* Dns Resolver Port 2")
+o.default = 5333
+o.datatype = "port"
+o.rmempty = false
+o.description = translate("Make sure port 5333 is free or resolver cannot start")
+
+
+o = s:option(Value, "dns_server")
+o.title = translate("* Dns Fowarder 1")
+o.default = "127.0.0.1#5353"
+o.rmempty = false
+o.description = translate("DNS Server port must be the same as Dns Resolver Port 1 clash nameserver: - 127.0.0.1:5353")
+
+o = s:option(Value, "dns_server_d")
+o.title = translate("* Dns Fowarder 2")
+o.default = "127.0.0.1#5353"
+o.rmempty = false
+o.description = translate("DNS Server port must be the same as Dns Resolver Port 2 clash nameserver: - 127.0.0.1:5353")
 
 return m

@@ -230,7 +230,7 @@ revert_dns() {
 
 add_cron(){
 	sed -i '/clash.log/d' $CRON_FILE
-	echo '0 1 * * 0 echo "" > /tmp/clash.log' >> $CRON_FILE
+	echo '0 0 * * 0 echo "" > /tmp/clash.log' >> $CRON_FILE
 	crontab $CRON_FILE
 }
 
@@ -240,10 +240,7 @@ del_cron()
 	sed -i '/clash.log/d' $CRON_FILE
 	/etc/init.d/cron restart
 }
-watchdog_service(){
-	[ -z "$(grep -w "/usr/share/clash/watchdog.sh" $CRON_FILE)" ] && echo "*/1 * * * * /usr/share/clash/watchdog.sh" >> $CRON_FILE
-	crontab $CRON_FILE
-}
+
 
 get_dnsmasq() {
 	local pid=$(pidof dnsmasq)
@@ -280,7 +277,8 @@ enable=$(uci get clash.config.enable 2>/dev/null)
 
 if [ $enable -eq 1 ]; then
 
-
+	nohup $CLASH -d "$CLASH_CONFIG" > /tmp/clash.log 2>&1 &
+         ln -s /usr/share/clash/web /www/clash
 	dns=$(uci get clash.config.dns 2>/dev/null)
 	bbr=$(uci get clash.config.bbr 2>/dev/null)
 	  
@@ -299,9 +297,6 @@ if [ $enable -eq 1 ]; then
 	else
 		sysctl -w net.ipv4.tcp_congestion_control=cubic
 	fi
-	
-	uci set firewall.@defaults[0].flow_offloading=1
-    uci commit firewall
 	
 	/etc/init.d/firewall restart >/dev/null 2>&1
 	
@@ -324,9 +319,9 @@ if [ $enable -eq 1 ]; then
         
     iptables -t nat -A PREROUTING -p tcp -j clash
      
-	nohup $CLASH -d "$CLASH_CONFIG" > /tmp/clash.log 2>&1 &
+	
 
-	ln -s /usr/share/clash/web /www/clash
+	
 	
 	/etc/init.d/dnsmasq restart >/dev/null 2>&1
 	
@@ -344,6 +339,12 @@ fi
 
 stop_service(){
 
+	srulecount=`iptables -L|grep CLASH|wc -l`
+	if [ $srulecount -gt 0 ] ;then
+		iptables -t nat -F CLASH
+		iptables -t nat -D PREROUTING -p tcp -j CLASH
+		iptables -t nat -X CLASH
+	fi
 
 	kill -9 $(ps | grep pdnsd | grep -v grep | awk '{print $1}') >/dev/null 2>&1 
 
@@ -360,7 +361,7 @@ stop_service(){
      
        rm -rf /www/clash 2> /dev/null
       del_cron  
-	watchdog_service
+
   
 	
 }

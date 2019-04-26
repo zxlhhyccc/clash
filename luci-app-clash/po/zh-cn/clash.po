@@ -5,7 +5,7 @@ msgid "clash"
 msgstr "clash"
 
 msgid "Clash Client"
-msgstr "基本设置"
+msgstr "Clash 客户端"
 
 msgid "Server Configuration"
 msgstr "配置文件"
@@ -37,8 +37,8 @@ msgstr "BBR拥塞控制算法可以加强TCP应用表现，但会降低路由器
 msgid "Enable DNS"
 msgstr "启用 DNS 加速"
 
-msgid "DNS Acceleration"
-msgstr "DNS 加速"
+msgid "DNS Acceleration & Forwarder"
+msgstr "DNS 加速 & 代理"
 
 msgid "Clash Client"
 msgstr "Clash 客户端"
@@ -46,12 +46,23 @@ msgstr "Clash 客户端"
 msgid "DNS Settings"
 msgstr "DNS 设置"
 
+msgid "Stop Client"
+msgstr "停止客户端"
+
+msgid "Start Client"
+msgstr "启动客户端"
+
 msgid "Server Config"
 msgstr "服务器配置"
 
+msgid "Upload Clash Configuration"
+msgstr "上传 Clash 配置"
+
+msgid "NB: Rename your config file to config.yml before upload. file will save to /etc/clash"
+msgstr "注意：上传之前，请将配置文件重命名为config.yml。文件将保存到 /etc/clash"
+
 msgid "Enable DNS Cache Acceleration and anti ISP DNS pollution"
 msgstr "启用DNS多线程查询、缓存，并防止ISP的DNS广告和域名劫持"
-
 
 msgid "Multiple DNS server can saperate with ','"
 msgstr "支持多个上游DNS服务器，用','分隔（注意用英文逗号).请填写您最快的DNS服务器"
@@ -75,7 +86,7 @@ msgid "Subcription Url"
 msgstr "订阅URL"
 
 msgid "Update Subcription"
-msgstr "更新"
+msgstr "更新订阅配置"
 
 msgid "Update Configuration"
 msgstr "更新配置文件"
@@ -104,8 +115,8 @@ msgstr "自动更新服务器订阅"
 msgid "Daily Server subscription update time"
 msgstr "每日服务器订阅更新时间"
 
-msgid "You can manually place config file in /etc/clash/config.yml"
-msgstr "您可以手动将配置文件放入/etc/clash/config.yml"
+msgid "Under Server Config you can manually upload configuration from pc"
+msgstr "在服务器配置可以选择手动上载配置"
 
 msgid "Changes to config file must be made from source"
 msgstr "必须从源文件更改配置文件"
