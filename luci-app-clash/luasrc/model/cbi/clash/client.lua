@@ -31,7 +31,6 @@ o.description = translate("Port must be the same as in your clash config file , 
 
 o = s:option(Value, "subscribe_url")
 o.title = translate("Subcription Url")
-o.description = translate("You can manually place config file in  /etc/clash/config.yml")
 o.rmempty = true
 
 o = s:option(Button,"update")
