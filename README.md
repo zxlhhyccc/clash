@@ -18,8 +18,8 @@ A rule based custom proxy for OpenWrt based on <a href="https://github.com/Dream
 ## Features
 
 - Support Vmess/Shadowsocks/Socks5
-- Support Shadowsock-V2ray-plugin
-- Support Shadowsock-Obfs-plugin
+- Support Shadowsocks-V2ray-plugin
+- Support Shadowsocks-Obfs-plugin
 - HTTP/HTTPS and SOCKS protocol
 - Support Rule such as HOST, HOST-SUFFIX, HOST-KEYWORD, GEOIP, USER-AGENT and IP-CIDR
 - For more info please referre to original documentation from <a href="https://docs.cfw.lbyczf.com/" target="_blank">Documetation</a>
