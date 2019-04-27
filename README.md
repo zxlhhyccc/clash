@@ -22,7 +22,7 @@ A rule based custom proxy for OpenWrt based on <a href="https://github.com/Dream
 - Support Shadowsocks-Obfs-plugin
 - HTTP/HTTPS and SOCKS protocol
 - Support Rule such as HOST, HOST-SUFFIX, HOST-KEYWORD, GEOIP, USER-AGENT and IP-CIDR
-- For more info please referre to original documentation from <a href="https://docs.cfw.lbyczf.com/" target="_blank">Documetation</a>
+<br>
 
 
 <div align=center><img src="https://raw.githubusercontent.com/frainzy1477/clash/master/preview/cvv1.png" /></div>
