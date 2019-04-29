@@ -231,6 +231,8 @@ revert_dns() {
 add_cron(){
 	sed -i '/clash.log/d' $CRON_FILE
 	echo '0 0 * * 0 echo "" > /tmp/clash.log' >> $CRON_FILE
+	[ -n "$(grep -w "/usr/share/clash/clash.sh" $CRON_FILE)" ] && sed -i '/\/usr\/share\/clash\/clash.sh/d' $CRON_FILE
+	[ $(uci get clash.config.auto_update 0) -eq 1 ] && echo "0 $(uci get clash.config.auto_update_time) * * * /usr/share/clash/clash.sh" >> $CRON_FILE
 	crontab $CRON_FILE
 }
 
@@ -270,7 +272,7 @@ dns_poisoning() {
 
 
 start_service(){
-watchdog_service
+
 proxy_port=$(uci get clash.config.proxy_port 2>/dev/null)
 
 enable=$(uci get clash.config.enable 2>/dev/null)
@@ -278,7 +280,9 @@ enable=$(uci get clash.config.enable 2>/dev/null)
 if [ $enable -eq 1 ]; then
 
 	nohup $CLASH -d "$CLASH_CONFIG" > /tmp/clash.log 2>&1 &
-         ln -s /usr/share/clash/web /www/clash
+	
+    ln -s /usr/share/clash/web /www/clash
+		 
 	dns=$(uci get clash.config.dns 2>/dev/null)
 	bbr=$(uci get clash.config.bbr 2>/dev/null)
 	  
@@ -297,7 +301,8 @@ if [ $enable -eq 1 ]; then
 	else
 		sysctl -w net.ipv4.tcp_congestion_control=cubic
 	fi
-	
+	uci set firewall.@defaults[0].flow_offloading=1
+        uci commit firewall
 	/etc/init.d/firewall restart >/dev/null 2>&1
 	
     dnsmasq_confdir=$(get_dnsmasq)
@@ -318,10 +323,6 @@ if [ $enable -eq 1 ]; then
     iptables -t nat -A clash -p tcp -j REDIRECT --to-ports $proxy_port
         
     iptables -t nat -A PREROUTING -p tcp -j clash
-     
-	
-
-	
 	
 	/etc/init.d/dnsmasq restart >/dev/null 2>&1
 	
@@ -351,20 +352,22 @@ stop_service(){
 	kill -9 `pidof clash|sed "s/$//g"` 2>/dev/null
 	
 	sysctl -w net.ipv4.tcp_congestion_control=cubic
-        kill $(pidof dnscache) >/dev/null 2>&1 || kill -9 $(ps | grep dnscache | grep -v grep | awk '{print $1}') >/dev/null 2>&1
+    
+	kill $(pidof dnscache) >/dev/null 2>&1 || kill -9 $(ps | grep dnscache | grep -v grep | awk '{print $1}') >/dev/null 2>&1
 	
 	revert_dns
-
+	uci set firewall.@defaults[0].flow_offloading=1
+    uci commit firewall
+	
 	/etc/init.d/firewall restart >/dev/null 2>&1
 	
-       /etc/init.d/dnsmasq restart >/dev/null 2>&1
+    /etc/init.d/dnsmasq restart >/dev/null 2>&1
      
-       rm -rf /www/clash 2> /dev/null
-      del_cron  
-
-  
-	
+    rm -rf /www/clash 2> /dev/null
+    del_cron
 }
+
+
 restart(){
     stop
     start

@@ -28,10 +28,21 @@ o.datatype = "port"
 o.rmempty = false
 o.description = translate("Port must be the same as in your clash config file , redir-port: 8236")
 
+o = s:option(Flag, "auto_update", translate("Auto Update"))
+o.rmempty = false
+o.description = translate("Auto Update Server subscription")
+
+
+o = s:option(ListValue, "auto_update_time", translate("Update time (every day)"))
+for t = 0,23 do
+o:value(t, t..":00")
+end
+o.default=0
+o.rmempty = false
 
 o = s:option(Value, "subscribe_url")
 o.title = translate("Subcription Url")
-o.description = translate("You can manually place config file in  /etc/clash/config.yml")
+o.description = translate("Server Subscription Address")
 o.rmempty = true
 
 o = s:option(Button,"update")

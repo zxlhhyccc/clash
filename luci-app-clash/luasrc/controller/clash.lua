@@ -30,9 +30,12 @@ local function is_bbr()
 end
 
 local function is_pdn()
-	return luci.sys.call("pgrep pdnsd >/dev/null") == 0
+	return luci.sys.call("pgrep dnscache >/dev/null") == 0
 end
 
+local function is_dns()
+	return luci.sys.call("pgrep pdnsd >/dev/null") == 0
+end
 
 function action_status()
 	luci.http.prepare_content("application/json")
@@ -40,6 +43,7 @@ function action_status()
 		web = is_web(),
 		clash = is_running(),
 		bbr = is_bbr(),
-		pdnsd = is_pdn()
+		pdnsd = is_pdn(),
+		dnscache = is_dns()
 	})
 end

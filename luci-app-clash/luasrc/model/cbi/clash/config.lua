@@ -6,7 +6,7 @@ local HTTP = require "luci.http"
 local DISP = require "luci.dispatcher"
 local UTIL = require "luci.util"
 
-local fs = require "luci.fs"
+
 local http = luci.http
 
 ful = SimpleForm("upload", translate("Server Configuration"), nil)
@@ -19,11 +19,10 @@ o.title = translate("Upload Clash Configuration")
 o.template = "clash/clash_upload"
 o.description = translate("NB: Rename your config file to config.yml before upload. file will save to /etc/clash")
 um = sul:option(DummyValue, "", nil)
-um.template = "cbi/other_dvalue"
+um.template = "clash/clash_dvalue"
 
 local dir, fd
 dir = "/etc/clash/"
--- nixio.fs.mkdir(dir)
 http.setfilehandler(
 	function(meta, chunk, eof)
 		if not fd then
