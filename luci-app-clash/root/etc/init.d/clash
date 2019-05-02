@@ -209,7 +209,7 @@ dns_server=$(uci get clash.config.dns_server 2>/dev/null)
 dns_serve1=$(uci get dhcp.@dnsmasq[0].server 2>/dev/null)
 dns_server_d=$(uci get clash.config.dns_server_d 2>/dev/null)
 	if [ $dns_serve1 ]; then
-		uci delete dhcp.@dnsmasq[0].server >/dev/null 2>&1
+	uci del dhcp.@dnsmasq[-1].server
 	fi	
 	uci add_list dhcp.@dnsmasq[0].server=$dns_server_d
 	uci add_list dhcp.@dnsmasq[0].server=$dns_server
@@ -219,10 +219,7 @@ dns_server_d=$(uci get clash.config.dns_server_d 2>/dev/null)
 }
 
 revert_dns() {
-	dns_server=$(uci get clash.config.dns_server 2>/dev/null)
-	dns_server_d=$(uci get clash.config.dns_server_d 2>/dev/null)
-	uci del_list dhcp.@dnsmasq[0].server=$dns_server_d >/dev/null 2>&1
-	uci del_list dhcp.@dnsmasq[0].server=$dns_server >/dev/null 2>&1
+	uci del dhcp.@dnsmasq[-1].server
 	uci set dhcp.@dnsmasq[0].resolvfile=/tmp/resolv.conf.auto
 	uci set dhcp.@dnsmasq[0].noresolv=0
 	uci commit dhcp
@@ -271,20 +268,49 @@ dns_poisoning() {
 }
 
 
+yml_change(){
+	proxy_port=$(uci get clash.config.proxy_port 2>/dev/null)
+	sed -i "s/allow-lan: false/allow-lan: true/" /etc/clash/config.yml
+	redir=`grep redir-port: /etc/clash/config.yml |awk -F ':' '{print $2}'`
+   	if [ $redir -ne $proxy_port ]; then
+	 sed -i '/redir-port:/ d' /etc/clash/config.yml
+	 sed -i "/allow-lan: true/i\redir-port: ${proxy_port}" /etc/clash/config.yml
+	fi
+        sed -i "s/log-level: silent/log-level: info/" /etc/clash/config.yml
+        external=`grep external-controller: /etc/clash/config.yml |awk -F ':' '{print $2}'`
+        if [ $external != "0.0.0.0" ]; then
+	    sed -i "s/external-controller: 127.0.0.1:/external-controller: 0.0.0.0:/" /etc/clash/config.yml
+        fi
+        sed -i "s/enable: false/enable: true/" /etc/clash/config.yml	
+
+	dns_port=`grep listen: /etc/clash/config.yml |awk -F ':' '{print $3}'`
+	if [ $dns_port -eq 53 ]; then
+	    sed -i "s/:53/:5354/" /etc/clash/config.yml
+	fi
+	pdnsd_port=$(uci get clash.config.pdnsd 2>/dev/null)
+        pdnsd_port_1=$(uci get clash.config.dnscache 2>/dev/null)
+        sed -i "/nameserver:/a\  - 127.0.0.1:${pdnsd_port}" /etc/clash/config.yml
+	sed -i "/127.0.0.1:${pdnsd_port}/a\  - 127.0.0.1:${pdnsd_port_1}" /etc/clash/config.yml	
+}
+
+
 start_service(){
 
-proxy_port=$(uci get clash.config.proxy_port 2>/dev/null)
-
+dns=$(uci get clash.config.dns 2>/dev/null)
+bbr=$(uci get clash.config.bbr 2>/dev/null)
 enable=$(uci get clash.config.enable 2>/dev/null)
+proxy_port=$(uci get clash.config.proxy_port 2>/dev/null)
 
 if [ $enable -eq 1 ]; then
 
-	nohup $CLASH -d "$CLASH_CONFIG" > /tmp/clash.log 2>&1 &
+    yml_change
+    sleep 2
+    nohup $CLASH -d "$CLASH_CONFIG" > /tmp/clash.log 2>&1 &
 	
     ln -s /usr/share/clash/web /www/clash
 		 
-	dns=$(uci get clash.config.dns 2>/dev/null)
-	bbr=$(uci get clash.config.bbr 2>/dev/null)
+    dnsmasq_confdir=$(get_dnsmasq)
+	dns_poisoning
 	  
 	if [ $dns -eq 1 ];  then
 		pdnsd_genconfig		
@@ -294,6 +320,7 @@ if [ $enable -eq 1 ]; then
 		procd_set_param stderr 1
 		procd_close_instance
 		change_dns
+		
 	fi
 	  
 	if [ $bbr -eq 1 ];  then
@@ -301,13 +328,13 @@ if [ $enable -eq 1 ]; then
 	else
 		sysctl -w net.ipv4.tcp_congestion_control=cubic
 	fi
+	
 	uci set firewall.@defaults[0].flow_offloading=1
+	
         uci commit firewall
+	
 	/etc/init.d/firewall restart >/dev/null 2>&1
 	
-    dnsmasq_confdir=$(get_dnsmasq)
-	dns_poisoning
-
 	
     iptables -t nat -N clash
                 
@@ -340,11 +367,11 @@ fi
 
 stop_service(){
 
-	srulecount=`iptables -L|grep CLASH|wc -l`
+	srulecount=`iptables -L|grep clash|wc -l`
 	if [ $srulecount -gt 0 ] ;then
-		iptables -t nat -F CLASH
-		iptables -t nat -D PREROUTING -p tcp -j CLASH
-		iptables -t nat -X CLASH
+		iptables -t nat -F clash
+		iptables -t nat -D PREROUTING -p tcp -j clash
+		iptables -t nat -X clash
 	fi
 
 	kill -9 $(ps | grep pdnsd | grep -v grep | awk '{print $1}') >/dev/null 2>&1 
@@ -356,20 +383,24 @@ stop_service(){
 	kill $(pidof dnscache) >/dev/null 2>&1 || kill -9 $(ps | grep dnscache | grep -v grep | awk '{print $1}') >/dev/null 2>&1
 	
 	revert_dns
+	
 	uci set firewall.@defaults[0].flow_offloading=1
-    uci commit firewall
+        uci commit firewall
 	
 	/etc/init.d/firewall restart >/dev/null 2>&1
 	
-    /etc/init.d/dnsmasq restart >/dev/null 2>&1
+        /etc/init.d/dnsmasq restart >/dev/null 2>&1
      
-    rm -rf /www/clash 2> /dev/null
-    del_cron
+       rm -rf /www/clash 2> /dev/null
+	
+       del_cron
 }
 
 
 restart(){
     stop
+    sleep 2
     start
 }
+
 

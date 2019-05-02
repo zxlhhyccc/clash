@@ -23,10 +23,11 @@ o.description = translate("After clash start running, wait a moment for servers 
 
 o = s:option(Value, "proxy_port")
 o.title = translate("* Clash Redir Port")
-o.default = 8236
+o.default = 7892
 o.datatype = "port"
 o.rmempty = false
-o.description = translate("Port must be the same as in your clash config file , redir-port: 8236")
+o.description = translate("Clash config redir-port: 7892")
+
 
 o = s:option(Flag, "auto_update", translate("Auto Update"))
 o.rmempty = false
@@ -56,22 +57,9 @@ o.write = function()
 end
 
 
-o = s:option(Button,"start")
-o.title = translate("Start Client")
-o.inputtitle = translate("Start Client")
-o.inputstyle = "reload"
-o.write = function()
-  os.execute("/etc/init.d/clash start >/dev/null 2>&1")
-  HTTP.redirect(DISP.build_url("admin", "services", "clash"))
-end
-
-o = s:option(Button,"stop")
-o.title = translate("Stop Client")
-o.inputtitle = translate("Stop Client")
-o.inputstyle = "reload"
-o.write = function()
-  os.execute("/etc/init.d/clash stop >/dev/null 2>&1")
-  HTTP.redirect(DISP.build_url("admin", "services", "clash"))
+local apply = luci.http.formvalue("cbi.apply")
+if apply then
+	os.execute("/etc/init.d/clash restart >/dev/null 2>&1 &")
 end
 
 

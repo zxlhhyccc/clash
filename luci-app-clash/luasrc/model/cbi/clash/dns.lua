@@ -56,6 +56,6 @@ o = s:option(Value, "dns_server_d")
 o.title = translate("* Dns Fowarder 2")
 o.default = "127.0.0.1#5353"
 o.rmempty = false
-o.description = translate("DNS Server port must be the same as Dns Resolver Port 2 clash nameserver: - 127.0.0.1:5353")
+o.description = translate("DNS Server port must be the same as Dns Resolver Port 2 clash nameserver: - 127.0.0.1:5333")
 
 return m

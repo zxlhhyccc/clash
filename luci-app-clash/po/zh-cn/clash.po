@@ -1,261 +1,131 @@
 msgid ""
-
 msgstr "Content-Type: text/plain; charset=UTF-8\n"
 
-
-
 msgid "clash"
-
 msgstr "clash"
 
-
-
 msgid "Clash Client"
-
 msgstr "Clash 客户端"
-
-
 
 msgid "Server Configuration"
-
 msgstr "配置文件"
 
-
-
 msgid "Server logs"
-
 msgstr "服务器日志"
-
-
 
 msgid "Logs"
-
 msgstr "服务器日志"
 
-
-
 msgid "Enable"
-
 msgstr "启用"
 
-
-
 msgid "Enable Clash"
-
 msgstr "启用 Clash"
 
-
-
 msgid "DNS Server 1"
-
 msgstr "上游 DNS 服务器(国内)"
 
-
-
 msgid "DNS Server 2"
-
 msgstr "上游 DNS 服务器(国际)"
 
-
-
 msgid "Enable BBR"
-
 msgstr "启用 BBR"
 
-
-
 msgid "Bottleneck Bandwidth and Round-trip propagation time (BBR)"
-
 msgstr "BBR拥塞控制算法可以加强TCP应用表现，但会降低路由器本机上的WIFI吞吐性能"
 
-
-
 msgid "Enable DNS"
-
 msgstr "启用 DNS 加速"
 
-
-
 msgid "DNS Acceleration & Forwarder"
-
 msgstr "DNS 加速 & 代理"
 
-
-
 msgid "Clash Client"
-
 msgstr "Clash 客户端"
 
-
-
 msgid "DNS Settings"
-
 msgstr "DNS 设置"
 
-
-
 msgid "Stop Client"
-
-msgstr "停止客户端"
-
-
+msgstr "停止 Clash"
 
 msgid "Start Client"
-
-msgstr "启动客户端"
-
-
+msgstr "启动 Clash"
 
 msgid "Server Config"
-
 msgstr "服务器配置"
 
-
-
 msgid "Upload Clash Configuration"
-
 msgstr "上传 Clash 配置"
 
-
-
 msgid "NB: Rename your config file to config.yml before upload. file will save to /etc/clash"
-
 msgstr "注意：上传之前，请将配置文件重命名为config.yml。文件将保存到 /etc/clash"
 
-
-
 msgid "Enable DNS Cache Acceleration and anti ISP DNS pollution"
-
 msgstr "启用DNS多线程查询、缓存，并防止ISP的DNS广告和域名劫持"
 
-
-
 msgid "Multiple DNS server can saperate with ','"
-
 msgstr "支持多个上游DNS服务器，用','分隔（注意用英文逗号).请填写您最快的DNS服务器"
 
-
-
 msgid "* Clash Redir Port"
-
 msgstr "* 转发端口"
 
-
-
 msgid "* Dns Resolver Port 1"
-
 msgstr "* 代理dns端口 1"
 
-
-
 msgid "* Dns Resolver Port 2"
-
 msgstr "* 代理dns端口 2"
 
-
-
 msgid "* Dns Fowarder 1"
-
 msgstr "* 代理dns服务器 1"
 
-
-
 msgid "* Dns Fowarder 2"
-
 msgstr "* 代理dns服务器 2"
 
-
-
 msgid "Subcription Url"
-
 msgstr "订阅URL"
 
-
-
 msgid "Update Subcription"
-
 msgstr "更新订阅配置"
 
-
-
 msgid "Update Configuration"
-
 msgstr "更新配置文件"
 
-
-
 msgid "Update time (every day)"
-
 msgstr "更新时间 (每天)"
 
-
-
 msgid "Auto Update"
-
 msgstr "自动更新"
 
-
-
 msgid "After clash start running, wait a moment for servers to resolve,enjoy"
-
 msgstr "运行后，等待服务器传播"
 
-
-
-msgid "Port must be the same as in your clash config file , redir-port: 8236"
-
-msgstr "端口必须与冲突配置文件中的端口相同，Redir端口：8236"
-
-
+msgid "Clash config redir-port: 7892"
+msgstr "转发端口：7892"
 
 msgid "Make sure port 5353 is free or resolver cannot start"
-
 msgstr "确保端口5353可用或PDNSD解析器无法启动"
 
-
-
 msgid "Make sure port 5333 is free or resolver cannot start"
-
 msgstr "确保端口5333可用或PDNSD解析器无法启动"
 
-
-
 msgid "DNS Server port must be the same as Dns Resolver Port 1 clash nameserver: - 127.0.0.1:5353"
-
 msgstr "DNS服务器端口必须与代理dns端口 1 5353相同，clash名称服务器：-127.0.0.1:5353"
 
-
-
-msgid "DNS Server port must be the same as Dns Resolver Port 2 clash nameserver: - 127.0.0.1:5353"
-
+msgid "DNS Server port must be the same as Dns Resolver Port 2 clash nameserver: - 127.0.0.1:5333"
 msgstr "DNS服务器端口必须与代理dns端口 2 5333相同，clash名称服务器：-127.0.0.1:5333"
 
-
-
 msgid "Server Subscription Address"
-
 msgstr "服务器订阅地址"
 
-
-
 msgid "Auto Update Server subscription"
-
 msgstr "自动更新服务器订阅"
 
-
-
 msgid "Daily Server subscription update time"
-
 msgstr "每日服务器订阅更新时间"
 
-
-
 msgid "Under Server Config you can manually upload configuration from pc"
-
 msgstr "在服务器配置可以选择手动上载配置"
 
-
-
 msgid "Changes to config file must be made from source"
-
 msgstr "必须从源文件更改配置文件"
