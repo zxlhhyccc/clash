@@ -289,6 +289,7 @@ yml_change(){
 	fi
 	pdnsd_port=$(uci get clash.config.pdnsd 2>/dev/null)
         pdnsd_port_1=$(uci get clash.config.dnscache 2>/dev/null)
+		sed -i '/127.0.0.1:/ d' /etc/clash/config.yml
         sed -i "/nameserver:/a\  - 127.0.0.1:${pdnsd_port}" /etc/clash/config.yml
 	sed -i "/127.0.0.1:${pdnsd_port}/a\  - 127.0.0.1:${pdnsd_port_1}" /etc/clash/config.yml	
 }

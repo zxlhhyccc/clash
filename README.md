@@ -25,7 +25,7 @@ A rule based custom proxy for OpenWrt based on <a href="https://github.com/Dream
 <br>
 
 
-<div align=center><img src="https://raw.githubusercontent.com/frainzy1477/clash/master/preview/cvvv1.png" /></div>
+<div align=center><img src="https://raw.githubusercontent.com/frainzy1477/clash/master/preview/x.png" /></div>
 
 <div align=center><img src="https://raw.githubusercontent.com/frainzy1477/clash/master/preview/cvv2.png" /></div>
 
